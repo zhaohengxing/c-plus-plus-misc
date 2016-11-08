@@ -89,6 +89,8 @@ that depend on them, must be constructed within the same execution thread.
 
 #endif
 
+#include "ios_flag_save.h"
+
 struct Ord_init_default_traits
   {
     #if __cplusplus < 201100
@@ -112,11 +114,17 @@ struct Ord_init_default_traits
         { return("Ord_init constructor encountered cycle"); }
       };
 
+    IOS_FLAG_SAVE(Ifs)
+
     static void cycle(uintptr_t addr)
       {
-        std::cerr
-          << "Cyclical initializaion dependencies for object at address 0x"
-          << std::hex << addr << '\n';
+        {
+          Ifs sentry(std::cerr);
+
+          std::cerr
+            << "Cyclical initializaion dependencies for object at address 0x"
+            << std::hex << addr << '\n';
+        }
 
         throw Ord_init_cycle_exception();
       }
