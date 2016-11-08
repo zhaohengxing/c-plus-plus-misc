@@ -36,6 +36,19 @@ The first use of b by class A's constructor must be a call to b.init().
 Class B must have a parameterless constructor.  The object b will implicitly
 convert to B &, and b() will return B &.
 
+If class B does not have a parameterless constructor, and you don't wish
+to make any changes to class B, you can derive an auxiliary class from B.
+Even if b also has external dependencies.  For example:
+
+extern Ord_init<A> a;
+
+struct B_aux_dep { B_aux_dep() { a.init(); } };
+
+struct B_aux : private B_aux_dep, public B
+  { B_aux() : B(a(), 666) { } };
+
+Ord_init<B_aux> b;
+
 If the constructor for class B depends on another object, c say, then c
 must be declared using Ord_init:
 
@@ -45,12 +58,12 @@ even if c is defined in the same compilation unit as b.  B's constructor must
 call c.init() before making any other use of c.
 
 Ord_init takes a second class parameter called Traits, which defaults to
-Ort_init_default_traits.  If using a version of C++ earlier than C++11,
+Ord_init_default_traits.  If using a version of C++ earlier than C++11,
 Traits must define the public type Align_type.  Align_type must be a POD
 type, with the same alignment requirements as the first type parameter to
-Ord_init.  Traits must have a public member function cycle(uintptr_t).
-This is called when a cyclical initialization dependency of Ord_init objects
-is detected.
+Ord_init.  Traits must have a public member function cycle(uintptr_t)
+(any return value is ignored).  This is called when a cyclical initialization
+dependency of Ord_init objects is detected.
 
 This facility does not provide any guarantees as to the order that objects
 are destroyed in.
