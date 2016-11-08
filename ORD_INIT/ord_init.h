@@ -27,7 +27,7 @@ and
 
 B b;
 
-are in different compilation units, but b's constructor depends on object a
+are in different compilation units, but a's constructor depends on object b
 being already initialized.  Then the declaration of b must be changed to
 
 Ord_init<B> b;
