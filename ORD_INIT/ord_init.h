@@ -180,7 +180,11 @@ class Ord_init
 
     operator T & () { return((*this)()); }
 
-    ~Ord_init() { reinterpret_cast<T *>(raw)->~T(); }
+    ~Ord_init()
+      {
+        if (status == Init_done)
+          reinterpret_cast<T *>(raw)->~T();
+      }
 
   // No copying except through T reference.
   #if __cplusplus < 201100
