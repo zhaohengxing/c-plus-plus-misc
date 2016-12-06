@@ -40,14 +40,17 @@ If class B does not have a parameterless constructor, and you don't wish
 to make any changes to class B, you can derive an auxiliary class from B.
 Even if b also has external dependencies.  For example:
 
-extern Ord_init<A> a;
+extern Ord_init<Class_of_object_b_depends_on> object_b_depends_on;
 
-struct B_aux_dep { B_aux_dep() { a.init(); } };
+struct B_aux_dep { B_aux_dep() { object_b_depends_on.init(); } };
 
 struct B_aux : private B_aux_dep, public B
-  { B_aux() : B(a(), 666) { } };
+  { B_aux() : B(object_b_depends_on(), 666) { } };
 
 Ord_init<B_aux> b;
+
+As illustrated here, a reference to the object that b depends on must
+be a parameter to the constructor of class B.
 
 If the constructor for class B depends on another object, c say, then c
 must be declared using Ord_init:
