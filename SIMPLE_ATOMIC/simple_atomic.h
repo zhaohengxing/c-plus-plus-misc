@@ -33,7 +33,7 @@ namespace Simple_atomic
 {
 
 // Dummy for overload selection.
-class No_threads { };
+struct No_threads { No_threads() { } };
 const No_threads no_threads;
 
 // Atomic type, std::atomic<T_> must be valid.
@@ -43,8 +43,8 @@ class T
   public:
 
     // Only use these at startup when only the main thread is running.
-    constexpr T(No_threads) : v() { }
-    constexpr T(No_threads, T_ v_) : v(v_) { }
+    constexpr T(No_threads) : v(ATOMIC_VAR_INIT(T_())) { }
+    constexpr T(No_threads, T_ v_) : v(ATOMIC_VAR_INIT(v_)) { }
 
     T(T_ v_ = T_()) { store(v_); }
     T(const T &t) { store(t.load()); }
@@ -59,6 +59,11 @@ class T
 
     T_ operator () () const { return(load()); }
 
+    // If the current value of this is not the expected one, the return
+    // value is false, and expected is set to the current value.
+    // Otherwise, the return value is true, and current value is set to
+    // the desired one.
+    //
     bool compare_exchange(T_ &expected, T_ desired)
       {
         return(
