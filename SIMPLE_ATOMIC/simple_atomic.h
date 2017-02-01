@@ -59,6 +59,13 @@ class T
 
     T_ operator () () const { return(load()); }
 
+    bool compare_exchange(T_ &expected, T_ desired)
+      {
+        return(
+          v.compare_exchange_weak(
+            expected, desired, std::memory_order_relaxed));
+      }
+
   private:
 
     std::atomic<T_> v;
