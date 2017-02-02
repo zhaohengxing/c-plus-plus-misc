@@ -50,7 +50,7 @@ class T
     T(const T &t) { store(t.load()); }
 
     T & operator = (T_ v_) { store(v_); return(*this); }
-    T & operator = (const T &t) { store(t.v); return(*this); }
+    T & operator = (const T &t) { store(t.load()); return(*this); }
 
     T(T &&t) = delete;
     void operator = (T &&t) = delete;
@@ -70,6 +70,10 @@ class T
           v.compare_exchange_weak(
             expected, desired, std::memory_order_relaxed));
       }
+
+    std::atomic<T_> & raw() { return(v); }
+
+    const std::atomic<T_> & raw() const { return(v); }
 
   private:
 
