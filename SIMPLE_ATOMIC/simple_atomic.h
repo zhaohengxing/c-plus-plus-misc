@@ -36,14 +36,14 @@ namespace Simple_atomic
 struct No_threads { No_threads() { } };
 const No_threads no_threads;
 
-// Atomic type, std::atomic<T_> must be valid.
+// Type for variable requiring atomic access, std::atomic<T_> must be valid.
 template <typename T_>
 class T
   {
   public:
 
     // Only use these at startup when only the main thread is running.
-    constexpr T(No_threads) : v(ATOMIC_VAR_INIT(T_())) { }
+    constexpr T(No_threads) { }
     constexpr T(No_threads, T_ v_) : v(ATOMIC_VAR_INIT(v_)) { }
 
     T(T_ v_ = T_()) { store(v_); }
@@ -82,7 +82,7 @@ class T
     T_ load() const { return(v.load(std::memory_order_relaxed)); }
     void store(T_ v_) { v.store(v_, std::memory_order_relaxed); }
 
-  };
+  }; // end class T
 
 // Memory fences
 
@@ -90,6 +90,17 @@ inline void release() { std::atomic_thread_fence(std::memory_order_release); }
 
 inline void acquire() { std::atomic_thread_fence(std::memory_order_acquire); }
 
-}
+inline void acquire_and_release()
+  { std::atomic_thread_fence(std::memory_order_acq_rel); }
+
+// Release fence whose primary purpose is to "promptly" make preceeding
+// stores visible in other threads.
+inline void make_visble(bool fastest = false)
+  {
+    std::atomic_thread_fence(
+      fastest ? std::memory_order_seq_cst : std::memory_order_release);
+  }
+
+} // end namespace Simple_atomic
 
 #endif // Include once.
