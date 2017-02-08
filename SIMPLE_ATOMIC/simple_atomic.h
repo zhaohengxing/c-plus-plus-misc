@@ -20,8 +20,8 @@ SOFTWARE.
 /*
 Definitions for simplifed use of atomic operations in Standard Library.
 
-All atomic memory accesses use relaxed ordering.  Ordering of atomic and
-non-atomic memory accesses is done with (free-standing) memory fences.
+Atomic memory accesses use relaxed ordering by default.  Ordering of atomic and
+non-atomic memory accesses is generally done with (free-standing) memory fences.
 */
 
 #ifndef SIMPLE_ATOMIC_20170201
@@ -59,6 +59,12 @@ class T
 
     T_ operator () () const { return(load()); }
 
+    // An atomic read which cannot be reordered with respect to other acquire
+    // reads or fences, and cannot be consolidated with other acquire reads (of
+    // the same instance).
+    //
+    T_ acquire() const { return(v.load(std::memory_order_acquire)); }
+
     // If the current value of this is not the expected one, the return
     // value is false, and expected is set to the current value.
     // Otherwise, the return value is true, and current value is set to
@@ -95,7 +101,7 @@ inline void acquire_and_release()
 
 // Release fence whose primary purpose is to "promptly" make preceeding
 // stores visible in other threads.
-inline void make_visble(bool fastest = false)
+inline void make_visible(bool fastest = false)
   {
     std::atomic_thread_fence(
       fastest ? std::memory_order_seq_cst : std::memory_order_release);
