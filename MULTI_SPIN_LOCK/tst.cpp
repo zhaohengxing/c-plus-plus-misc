@@ -53,6 +53,7 @@ class Test_thread
 
     void operator () ()
       {
+        static unsigned trace_val = 1000;
         int random;
 
         while (!done)
@@ -62,8 +63,12 @@ class Test_thread
 
               ++thread_lock_count[index];
 
-              if (((i % 10000) == 0) and i)
-                std::cout << "i = " << i << std::endl;
+              if (i == trace_val)
+                {
+                  std::cout << "i = " << i << std::endl;
+
+                  trace_val *= 10;
+                }
 
               if (j != (i + 1))
                 std::cout << std::this_thread::get_id() << ' ' << i << ' ' << j

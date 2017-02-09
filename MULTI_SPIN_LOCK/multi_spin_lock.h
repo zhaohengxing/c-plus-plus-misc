@@ -51,20 +51,20 @@ struct Multi_spin_lock_default_traits
 // The "Traits" template parameter is expected to have the following
 // public members:
 //
-//  static const bool Enable_stats -- if true, enables recording of
-//    retry count high water mark.
+// static const bool Enable_stats -- if true, enables recording of
+//   retry count high water mark.
 //
-//  type Thread_id -- instances identify threads, must have =, ==, copy
-//    constructor.
+// type Thread_id -- instances identify threads, must have =, ==, copy
+//   constructor.
 //
-//  static Thread_id no_thread() -- must return an instance of Thread_id
-//    that will never correspond to any thread.
+// static Thread_id no_thread() -- must return an instance of Thread_id
+//   that will never correspond to any thread.
 //
-//  static Thread_id this_tid() -- returns the default value for all
-//    member functions with a "this_tid" parameter (which must be
-//    the thread id of the thread calling the member function).  This
-//    may return the same value as no_thread(), but in that case, care
-//    must be taken to never omit the "this_tid" parameter.
+// static Thread_id this_tid() -- returns the default value for all
+//   member functions with a "this_tid" parameter (which must be
+//   the thread id of the thread calling the member function).  This
+//   may return the same value as no_thread(), but in that case, care
+//   must be taken to never omit the "this_tid" parameter.
 //
 // static bool
 // retry_validate(Simple_atomic::T<Thread_id> &tid, unsigned tries) --
@@ -112,7 +112,7 @@ class Multi_spin_lock
     //
     static Sa_uint & retry_high_water_()
       {
-        static Sa_uint i;
+        static Sa_uint i(Simple_atomic::No_threads);
 
         return(i);
       }
@@ -195,7 +195,7 @@ class Multi_spin_lock
       }
 
     // Try and retry to lock, repeatedly.  Returns false if fails to lock.
-    // Also provided an acquire memory fence.
+    // Also provides an acquire memory fence.
     //
     bool wait_lock(Thread_id this_tid = Traits::this_tid())
       {
