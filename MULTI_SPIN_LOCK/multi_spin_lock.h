@@ -38,10 +38,6 @@ struct Multi_spin_lock_default_traits
 
     static Thread_id this_tid() { return(std::this_thread::get_id());}
 
-    // Parameter is the number of times the thread has already tried to
-    // lock the spin lock.  Throws an exception, exits/resets, or returns
-    // false if the number of ties is unacceptable.
-    //
     static bool retry_validate(
       Simple_atomic::T<Thread_id> & /* tid */, unsigned /* tries */)
       { return(true); }
