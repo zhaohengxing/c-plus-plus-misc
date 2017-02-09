@@ -73,7 +73,9 @@ struct Multi_spin_lock_default_traits
 //   preceeding the call.  It can return false to cause wait_lock() to fail.
 //   It can throw an exception or exit/restart. "tid" is the private data
 //   member of the spin lock.  This function could detect if the thread
-//   holding the spin lock has exited.
+//   holding the spin lock has exited.  If your environment has many threads
+//   of equal priority with round-robin scheduling, it might make sense to
+//   do a "yield" every time (tries % N) == 0 for some N.
 //
 template<class Traits = Multi_spin_lock_default_traits>
 class Multi_spin_lock
