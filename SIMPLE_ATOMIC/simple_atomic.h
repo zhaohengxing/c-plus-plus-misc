@@ -58,12 +58,6 @@ class T
 
     T_ operator () () const { return(load()); }
 
-    // An atomic read which cannot be reordered with respect to other acquire
-    // reads or fences, and cannot be consolidated with other acquire reads (of
-    // the same instance).
-    //
-    T_ acquire() const { return(v.load(std::memory_order_acquire)); }
-
     // If the current value of this is not the expected one, the return
     // value is false, and expected is set to the current value.
     // Otherwise, the return value is true, and current value is set to

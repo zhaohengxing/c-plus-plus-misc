@@ -123,7 +123,7 @@ class Multi_spin_lock
     struct Stats_<true, Dummy>
       {
         static unsigned retry_high_water()
-          { return(retry_high_water_().acquire()); }
+          { return(retry_high_water_()); }
 
         static void report_retries(unsigned num)
           {
@@ -167,7 +167,8 @@ class Multi_spin_lock
     //
     constexpr Multi_spin_lock(Thread_id tid_ = no_thread()) : tid(tid_) { }
 
-    // Get retry high water mark.
+    // Get retry high water mark.  (There should be an acquire fence between
+    // calls to this function in the same thread).
     //
     static unsigned retry_high_water() { return(Stats::retry_high_water()); }
 
