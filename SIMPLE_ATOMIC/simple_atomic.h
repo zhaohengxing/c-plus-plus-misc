@@ -33,8 +33,7 @@ namespace Simple_atomic
 {
 
 // Dummy for overload selection.
-struct No_threads_ { };
-constexpr No_threads_ *No_threads = nullptr;
+enum No_threads_ { No_threads };
 
 // Type for variable requiring atomic access, std::atomic<T_> must be valid.
 template <typename T_>
@@ -43,7 +42,7 @@ class T
   public:
 
     // Only use this for const initialization.
-    constexpr T(No_threads_ *, T_ v_ = T_()) : v(ATOMIC_VAR_INIT(v_)) { }
+    constexpr T(No_threads_, T_ v_ = T_()) : v(ATOMIC_VAR_INIT(v_)) { }
 
     T(T_ v_ = T_()) { store(v_); }
     T(const T &t) { store(t.load()); }
