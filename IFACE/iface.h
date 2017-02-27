@@ -38,11 +38,11 @@ struct IF_NAME \
         Iface_impl::Class_id class_id; \
       }; \
  \
-    void CV * const this_; \
+    CV void * const this_; \
  \
     const Vstruct * const vptr; \
  \
-    IF_NAME(void *t, const Vstruct *vptr_) : this_(t), vptr(vptr_) { } \
+    IF_NAME(CV void * t, const Vstruct *vptr_) : this_(t), vptr(vptr_) { } \
   };
 
 #define IFACE_ENABLE(IF_SPEC, FUNC_LIST, CLS_SPEC) \
@@ -63,7 +63,7 @@ class Enable<IF_SPEC, CLS_SPEC> \
  \
     static const IF_SPEC::Vstruct * vptr() \
       { \
-        static const IF_SPEC::Vstruct v = \
+        static const IF_SPEC::Vstruct IFACE_v = \
           { \
             FUNC_LIST(IFACE_IMPL_ENB_FUNC_ADDR, \
                       IFACE_IMPL_ENB_FUNC_ADDR_NR) \
@@ -71,7 +71,7 @@ class Enable<IF_SPEC, CLS_SPEC> \
             id<CLS_SPEC>() \
           }; \
  \
-        return(&v); \
+        return(&IFACE_v); \
       } \
   }; \
  \
@@ -139,7 +139,7 @@ Dest_iface iface_convert(Src_iface src_if)
   {
     return(
       Dest_iface(
-        src_if->this_,
+        src_if.this_,
         Iface_impl::Convert<Dest_iface, Src_iface>::vptr(src_if.vptr)));
   }
 
@@ -159,7 +159,7 @@ static TYPE NAME(CV void *this_, PARAMS(IFACE_IMPL_FULL_PARAM) ) \
   }
 
 #define IFACE_IMPL_THUNK_NR(NAME, CV, PARAMS) \
-static void NAME(void *this_, PARAMS(IFACE_IMPL_FULL_PARAM) ) \
+static void NAME(CV void *this_, PARAMS(IFACE_IMPL_FULL_PARAM) ) \
   { \
     static_cast<CV Cls *>(this_)->NAME( PARAMS(IFACE_IMPL_PARAM_NAME) ); \
   }
