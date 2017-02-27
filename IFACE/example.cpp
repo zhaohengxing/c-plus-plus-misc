@@ -157,7 +157,7 @@ class Z_X_A
     Method x1(int, int) { return(M_a_x_1); }
   };
 
-// Enable Z_X instances to interface to Z_X_A interfaces.
+// Enable Z_X instances to interface to Z_X_A instances.
 //
 IFACE_ENABLE(Z_X, Z_X_FUNC_LIST, Z_X_A)
 
