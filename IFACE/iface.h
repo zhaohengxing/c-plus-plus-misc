@@ -18,13 +18,56 @@ SOFTWARE.
 */
 
 /*
+
+"Go-like" interfaces for C++.  See example.cpp for example use.
+
+The primarily intent of this code is to explore the idea of adding
+interfaces to the C++ base language.
+
+It's possible that this facility could be changed to allow class public data
+members to be accessed through interfaces.  (For now, one can make Bill
+Gates's day and use getters and setters.)
+
+Definitions:
+
+- A "param list" is a macro that defines the parameters to a (member)
+function.  It must take (only) one parameter.  If the parameter is named P,
+then the param list must be defined as a blank-separated sequence of:
+
+P(TYPE, NAME)
+
+Where TYPE specifies the type of the parameter, and NAME is the name
+of the parameter.  IP_NO_PARAMS is an empty param list.
+
+- A "function list" is a macro that encodes the interfaces to multiple
+(member) functions.  It must take (only) two parameters.  If the two
+parameters are named F and FNR, then the function list must be defined as a
+blank-separated sequence of:
+
+F(TYPE, NAME, CV, PARAM_LIST)
+
+and/or
+
+FNR(NAME, CV, PARAM_LIST)
+
+TYPE specifies the return type of the function (use FNR for void functions).
+NAME is the name of the function.  CV is either blank or a CV type qualifier.
+PARAM_LIST is a param list (defined above) specifying the function parameters.
+
 */
 
 #ifndef IFACE_20170223
 #define IFACE_20170223
 
+// Empty param list.
+//
 #define IFACE_NO_PARAMS(P) P(..., ) 
 
+// Defines an interface (type).  IF_NAME is the name of the interface type.
+// CV is a CV type qualifier for the object being interfaced to (not mutable).
+// FUNC_LIST is a function list, specifying the member functions of the
+// interface.
+//
 #define IFACE_DEF(IF_NAME, CV, FUNC_LIST) \
  \
 struct IF_NAME \
@@ -45,6 +88,12 @@ struct IF_NAME \
     IF_NAME(CV void * t, const Vstruct *vptr_) : this_(t), vptr(vptr_) { } \
   };
 
+// Enable instance of a class to be interfaced to by instances of an
+// interface.  IF_SPEC is the qualified name of the interface type.
+// FUNC_LIST is the function list that was used to define the interface type.
+// CLS_SPEC is the qualified name of the class.  This can only be invoked
+// at global scope.
+//
 #define IFACE_ENABLE(IF_SPEC, FUNC_LIST, CLS_SPEC) \
  \
 namespace Iface_impl \
@@ -77,6 +126,15 @@ class Enable<IF_SPEC, CLS_SPEC> \
  \
 }
 
+// Enable conversion from one interface instance to another of a different
+// type (by iface_convert).  DEST_IF_SPEC is the qualified name of the type
+// of the interace instance to be returned by iface_convert.  DEST_FUNC_LIST
+// is the function list used to define the destination destination interface
+// type.  SRC_IF_SPEC is the qualified name of the type of the interface
+// interface that will be the parameter to iface_convert for this conversion.
+// The functions in the destination interface must be a subset of those in
+// the source interface.  This macro can only be invoked at global scope.
+//
 #define IFACE_CONVERSION(DEST_IF_SPEC, DEST_FUNC_LIST, SRC_IF_SPEC) \
  \
 namespace Iface_impl \
@@ -114,13 +172,21 @@ struct Convert<DEST_IF_SPEC, SRC_IF_SPEC> \
  \
 }
 
+// Call the member function NAME through the interface instance IF_INST.  The
+// variable arguments must be the member function's actual arguments.
+//
 #define IFACE_CALL(IF_INST, NAME, ...) \
 (IF_INST).vptr->NAME((IF_INST).this_, __VA_ARGS__)
 
+// Call the member function NAME, which takes no arguments, through the
+// interface instance IF_INST.
+//
 #define IFACE_CALL_NP(IF_INST, NAME) (IF_INST).vptr->NAME((IF_INST).this_)
 
 namespace Iface_impl
 {
+
+// Don't use anything in this namespace directly.
 
 template <class Iface, class Target>
 class Enable;
@@ -130,10 +196,15 @@ class Convert;
 
 } // end namespace Iface_impl
 
+// Return an interface instance of type Iface that interfaces to an
+// object of type Target.
+//
 template <class Iface, class Target>
 Iface iface_factory(Target &t)
   { return(Iface(&t, Iface_impl::Enable<Iface, Target>::vptr())); }
 
+// Convert an interface instance of type Src_iface to one of type Dest_iface.
+//
 template <class Dest_iface, class Src_iface>
 Dest_iface iface_convert(Src_iface src_if)
   {
@@ -143,7 +214,7 @@ Dest_iface iface_convert(Src_iface src_if)
         Iface_impl::Convert<Dest_iface, Src_iface>::vptr(src_if.vptr)));
   }
 
-// ----- Private macros (don't use directly) --------------------------
+// ----- Private stuff (don't use directly) --------------------------
 
 #define IFACE_IMPL_FUNC_POINTER(TYPE, NAME, CV, PARAMS) \
 TYPE (*NAME) (CV void *this_, PARAMS(IFACE_IMPL_FULL_PARAM) );
@@ -211,7 +282,9 @@ class Convert_key
 
     Convert_key(Iface_id i, Class_id c) : dest_iface_id(i), class_id(c) { }
 
-    // Hopefully never a loss of nominal or actual precision.
+    // Hopefully never a loss of nominal or actual precision in any
+    // C++ implementation.
+    //
     long long hash_me() const { return(dest_iface_id - class_id); }
 
     friend bool operator == (Convert_key a, Convert_key b)
@@ -245,6 +318,7 @@ namespace Iface_impl
 using Convert_map = std::unordered_map<Convert_key, const void *>;
 
 // Map to get vpointer in interface conversion.
+//
 inline Convert_map & convert_map()
   {
     static Convert_map m;
