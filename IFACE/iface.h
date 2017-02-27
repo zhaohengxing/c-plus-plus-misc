@@ -214,6 +214,17 @@ Dest_iface iface_convert(Src_iface src_if)
         Iface_impl::Convert<Dest_iface, Src_iface>::vptr(src_if.vptr)));
   }
 
+/*
+
+Bad implementation artifcats of this facility include:
+
+- No member function name overloading in interfaces.
+
+- If you call a parameterless interface function with parameters, they
+will be ignored at run-time, but you will not get a compile error.
+
+*/
+
 // ----- Private stuff (don't use directly) --------------------------
 
 #define IFACE_IMPL_FUNC_POINTER(TYPE, NAME, CV, PARAMS) \
@@ -329,3 +340,4 @@ inline Convert_map & convert_map()
 } // end namespace Iface_impl
 
 #endif // Include once.
+
