@@ -314,5 +314,12 @@ int main()
     if (Iface_impl::convert_map().size() != 3)
       std::cout << "BAD\n";
 
+    #define X(CLS) \
+      std::cout << "sizeof(" << #CLS << ") = " << sizeof(CLS) << '\n';
+
+    X(Z_X_A)
+    X(Z_X_B)
+    X(Z_Y_C)
+
     return(0);
   }
