@@ -62,7 +62,7 @@ P(void *, p1)
 #define Z_FUNC_LIST(F, FNR) \
 F(Instance, who, const, IFACE_NO_PARAMS) \
 F(Method, z1, , Z1_PARAMS) \
-FNR(z2, , Z2_PARAMS) \
+FNR(z2, , Z2_PARAMS)
 
 IFACE_DEF(Z, , Z_FUNC_LIST)
 
@@ -95,7 +95,7 @@ P(double, p1)
 #define Z_X_FUNC_LIST(F, FNR) \
 Z_FUNC_LIST(F, FNR) \
 F(Method, x1, , X1_PARAMS) \
-FNR(x2, , X2_PARAMS) \
+FNR(x2, , X2_PARAMS)
 
 IFACE_DEF(Z_X, , Z_X_FUNC_LIST)
 
@@ -202,7 +202,7 @@ P(unsigned, p1)
 #define Z_Y_FUNC_LIST(F, FNR) \
 Z_FUNC_LIST(F, FNR) \
 F(Method, y1, , Y1_PARAMS) \
-F(Method, y2, , Y2_PARAMS) \
+F(Method, y2, , Y2_PARAMS)
 
 IFACE_DEF(Z_Y, , Z_Y_FUNC_LIST)
 
