@@ -321,5 +321,13 @@ int main()
     X(Z_X_B)
     X(Z_Y_C)
 
+    using An_interface_type = Z_Y;
+
+    X(An_interface_type)
+
+    using A_pointer = Z_Y_C *;
+
+    X(A_pointer)
+
     return(0);
   }

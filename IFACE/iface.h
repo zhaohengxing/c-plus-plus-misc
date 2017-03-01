@@ -143,8 +143,6 @@ namespace Iface_impl \
 template <> \
 struct Convert<DEST_IF_SPEC, SRC_IF_SPEC> \
   { \
-  public: \
- \
     static const DEST_IF_SPEC::Vstruct * vptr( \
       const SRC_IF_SPEC::Vstruct *src_vptr) \
       { \
