@@ -25,8 +25,7 @@ The primarily intent of this code is to explore the idea of adding
 interfaces to the C++ base language.
 
 It's possible that this facility could be changed to allow class public data
-members to be accessed through interfaces.  (For now, one can make Bill
-Gates's day and use getters and setters.)
+members to be accessed through interfaces.
 
 Definitions:
 
@@ -37,7 +36,7 @@ then the param list must be defined as a blank-separated sequence of:
 P(TYPE, NAME)
 
 Where TYPE specifies the type of the parameter, and NAME is the name
-of the parameter.  IP_NO_PARAMS is an empty param list.
+of the parameter.  IFACE_NO_PARAMS is an empty param list.
 
 - A "function list" is a macro that encodes the interfaces to multiple
 (member) functions.  It must take (only) two parameters.  If the two
@@ -277,6 +276,9 @@ using Class_id = int *;
 
 using Iface_id = int *;
 
+// Key for lookup table from interface type / class type combo to a pointer
+// to a pointer to the vstructure for the class for that interface.
+//
 class Convert_key
   {
   private:
@@ -284,15 +286,16 @@ class Convert_key
     // ID of interface resulting from interface conversion.
     const Iface_id dest_iface_id;
 
-    // Class of instance interfaced to.
+    // ID of class of instance interfaced to.
     const Class_id class_id;
 
   public:
 
     Convert_key(Iface_id i, Class_id c) : dest_iface_id(i), class_id(c) { }
 
-    // Hopefully never a loss of nominal or actual precision in any
-    // C++ implementation.
+    // "Pre-hash" this instance to produce a value of a type for which
+    // std::hash is already defined.  Hopefully never a loss of nominal
+    // or actual precision in any C++ implementation.
     //
     long long hash_me() const { return(dest_iface_id - class_id); }
 
@@ -326,7 +329,8 @@ namespace Iface_impl
 
 using Convert_map = std::unordered_map<Convert_key, const void *>;
 
-// Map to get vpointer in interface conversion.
+// Map to get vpointer for result (destination) interface in interface
+// conversion.
 //
 inline Convert_map & convert_map()
   {
